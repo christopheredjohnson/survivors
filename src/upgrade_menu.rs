@@ -1,4 +1,5 @@
 use crate::level::{IsUpgradeMenuOpen, LevelUpEvent, PlayerXP};
+use crate::player::PlayerStats;
 use crate::projectile::ProjectileKind;
 use crate::upgrade::{UpgradeButton, UpgradeEffect, UpgradeMenuRoot};
 use crate::weapon::WeaponStats;
@@ -10,7 +11,6 @@ pub fn show_upgrade_menu(
     mut commands: Commands,
     mut ev_levelup: EventReader<LevelUpEvent>,
     mut open: ResMut<IsUpgradeMenuOpen>,
-    asset_server: Res<AssetServer>,
 ) {
     if ev_levelup.is_empty() || open.0 {
         return;
@@ -43,7 +43,7 @@ pub fn show_upgrade_menu(
                 align_items: AlignItems::Center,
                 ..default()
             },
-            background_color: Color::rgba(0.0, 0.0, 0.0, 0.8).into(),
+            background_color: Color::srgba(0.0, 0.0, 0.0, 0.8).into(),
             ..default()
         })
         .insert(UpgradeMenuRoot)
@@ -94,7 +94,8 @@ pub fn show_upgrade_menu(
 pub fn handle_upgrade_selection(
     mut commands: Commands,
     mut interaction_q: Query<(&Interaction, &UpgradeButton, Entity), Changed<Interaction>>,
-    mut stats: ResMut<WeaponStats>,
+    mut weapon_stats: ResMut<WeaponStats>,
+    mut player_stats: ResMut<PlayerStats>,
     mut xp: ResMut<PlayerXP>,
     mut open: ResMut<IsUpgradeMenuOpen>,
     upgrade_menu_roots: Query<Entity, With<UpgradeMenuRoot>>,
@@ -103,12 +104,12 @@ pub fn handle_upgrade_selection(
         if *interaction == Interaction::Pressed {
             match &button.0 {
                 UpgradeEffect::ChangeShotType(kind) => {
-                    stats.current_shot_type = *kind;
+                    weapon_stats.current_shot_type = *kind;
                 }
-                UpgradeEffect::IncreaseMultishot(n) => stats.multishot += n,
-                UpgradeEffect::IncreaseSpread(s) => stats.spread_deg += s,
-                UpgradeEffect::IncreaseProjectileSpeed(s) => stats.projectile_speed += s,
-                UpgradeEffect::IncreaseMoveSpeed(_) => println!("TODO: Move speed upgrade"),
+                UpgradeEffect::IncreaseMultishot(n) => weapon_stats.multishot += n,
+                UpgradeEffect::IncreaseSpread(s) => weapon_stats.spread_deg += s,
+                UpgradeEffect::IncreaseProjectileSpeed(s) => weapon_stats.projectile_speed += s,
+                UpgradeEffect::IncreaseMoveSpeed(s) => player_stats.move_speed += s,
                 UpgradeEffect::IncreaseXPGain(x) => xp.orb_value += x,
             }
 

@@ -50,12 +50,13 @@ pub fn enemy_spawner(
             SpriteBundle {
                 transform: Transform::from_xyz(spawn_x, spawn_y, 0.0).with_scale(Vec3::splat(24.0)),
                 sprite: Sprite {
-                    color: Color::rgb(0.8, 0.2, 0.2),
+                    color: Color::srgb(0.8, 0.2, 0.2),
                     ..default()
                 },
                 ..default()
             },
             Enemy,
+            Name::new("Enemy"),
         ));
     }
 }

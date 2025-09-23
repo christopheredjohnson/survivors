@@ -15,8 +15,5 @@ pub enum UpgradeEffect {
 #[derive(Component)]
 pub struct UpgradeButton(pub UpgradeEffect);
 
-#[derive(Resource)]
-pub struct UpgradePool(pub Vec<UpgradeEffect>);
-
 #[derive(Component)]
 pub struct UpgradeMenuRoot;

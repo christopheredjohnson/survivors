@@ -12,7 +12,8 @@ impl Default for WeaponTimer {
     }
 }
 
-#[derive(Resource)]
+#[derive(Resource, Reflect)]
+#[reflect(Resource)]
 pub struct WeaponStats {
     pub multishot: u32,  // Number of projectiles
     pub spread_deg: f32, // Total arc of spread
@@ -77,7 +78,7 @@ pub fn weapon_system(
                 SpriteBundle {
                     transform: Transform::from_translation(player_transform.translation),
                     sprite: Sprite {
-                        color: Color::rgb(1.0, 0.7, 0.3),
+                        color: Color::srgb(1.0, 0.7, 0.3),
                         custom_size: Some(Vec2::splat(10.)),
                         ..default()
                     },

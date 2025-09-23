@@ -30,7 +30,7 @@ pub fn setup_xp_bar(mut commands: Commands) {
                         height: Val::Percent(100.0),
                         ..default()
                     },
-                    background_color: Color::rgb(0.2, 0.7, 1.0).into(),
+                    background_color: Color::srgb(0.2, 0.7, 1.0).into(),
                     ..default()
                 })
                 .insert(XpBarFill);

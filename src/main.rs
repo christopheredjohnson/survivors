@@ -1,6 +1,10 @@
 use bevy::prelude::*;
+use bevy_inspector_egui::quick::WorldInspectorPlugin;
 
-use crate::level::{IsUpgradeMenuOpen, LevelUpEvent};
+use crate::{
+    level::XPPlugin,
+    player::PlayerPlugin,
+};
 
 mod enemy;
 mod level;
@@ -10,7 +14,6 @@ mod ui;
 mod upgrade;
 mod upgrade_menu;
 mod weapon;
-mod xp;
 
 fn main() {
     App::new()
@@ -22,9 +25,7 @@ fn main() {
             }),
             ..default()
         }))
-        .add_event::<LevelUpEvent>()
-        .insert_resource(IsUpgradeMenuOpen::default())
-        .insert_resource(level::PlayerXP::default())
+        .add_plugins((PlayerPlugin, XPPlugin, WorldInspectorPlugin::default()))
         .insert_resource(weapon::WeaponTimer::default())
         .insert_resource(weapon::WeaponStats::default())
         .insert_resource(enemy::EnemySpawnTimer::default())
@@ -32,13 +33,11 @@ fn main() {
         .add_systems(
             Update,
             (
-                player::player_movement,
                 weapon::weapon_system,
                 projectile::projectile_movement,
                 enemy::enemy_movement,
                 enemy::enemy_spawner,
                 projectile::projectile_enemy_collision,
-                xp::xp_collection,
                 upgrade_menu::show_upgrade_menu,
                 upgrade_menu::handle_upgrade_selection,
                 ui::update_xp_bar,
@@ -49,5 +48,4 @@ fn main() {
 
 fn setup(mut commands: Commands) {
     commands.spawn(Camera2dBundle::default());
-    player::spawn_player(&mut commands);
 }

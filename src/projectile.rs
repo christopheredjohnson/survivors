@@ -1,6 +1,6 @@
 use crate::enemy::Enemy;
 use crate::weapon::WeaponStats;
-use crate::xp;
+use crate::level;
 use bevy::prelude::*;
 
 #[derive(Component)]
@@ -9,7 +9,7 @@ pub struct Projectile {
     pub kind: ProjectileKind,
 }
 
-#[derive(Clone, Copy, PartialEq, Eq)]
+#[derive(Clone, Copy, PartialEq, Eq, Reflect)]
 pub enum ProjectileKind {
     Normal,
     Fireball,
@@ -38,7 +38,7 @@ pub fn projectile_enemy_collision(
             if proj_t.translation.distance(enemy_t.translation) < 20.0 {
                 match proj.kind {
                     ProjectileKind::Normal => {
-                        xp::spawn_xp(&mut commands, enemy_t.translation);
+                        level::spawn_xp(&mut commands, enemy_t.translation);
                         commands.entity(enemy_e).despawn();
                         commands.entity(proj_e).despawn();
                     }
@@ -46,19 +46,19 @@ pub fn projectile_enemy_collision(
                         // AoE effect: despawn all nearby enemies
                         for (e, t) in enemy_q.iter() {
                             if t.translation.distance(proj_t.translation) < 50.0 {
-                                xp::spawn_xp(&mut commands, t.translation);
+                                level::spawn_xp(&mut commands, t.translation);
                                 commands.entity(e).despawn();
                             }
                         }
                         commands.entity(proj_e).despawn();
                     }
                     ProjectileKind::Piercing => {
-                        xp::spawn_xp(&mut commands, enemy_t.translation);
+                        level::spawn_xp(&mut commands, enemy_t.translation);
                         // Damage multiple enemies; don't despawn projectile
                         commands.entity(enemy_e).despawn();
                     }
                     ProjectileKind::Ice => {
-                        xp::spawn_xp(&mut commands, enemy_t.translation);
+                        level::spawn_xp(&mut commands, enemy_t.translation);
                         // TODO: Slow effect (can be added with a Slowed component + timer)
                         commands.entity(enemy_e).despawn();
                         commands.entity(proj_e).despawn();
