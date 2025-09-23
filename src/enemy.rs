@@ -33,6 +33,8 @@ pub fn enemy_spawner(
     time: Res<Time>,
     mut timer: ResMut<EnemySpawnTimer>,
     player_q: Query<&Transform, With<Player>>,
+    asset_server: Res<AssetServer>,
+    mut texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
 ) {
     timer.0.tick(time.delta());
 
@@ -46,15 +48,23 @@ pub fn enemy_spawner(
         let spawn_x = player_t.translation.x + radius * angle.cos();
         let spawn_y = player_t.translation.y + radius * angle.sin();
 
+
+        let texture = asset_server.load("Skeleton.png");
+
+    // the sprite sheet has 7 sprites arranged in a row, and they are all 24px x 24px
+        let layout = TextureAtlasLayout::from_grid(UVec2::splat(100), 8, 7, None, None);
+        let texture_atlas_layout = texture_atlas_layouts.add(layout);
+
         commands.spawn((
             SpriteBundle {
-                transform: Transform::from_xyz(spawn_x, spawn_y, 0.0).with_scale(Vec3::splat(24.0)),
-                sprite: Sprite {
-                    color: Color::srgb(0.8, 0.2, 0.2),
+                    transform: Transform::from_xyz(spawn_x, spawn_y, 0.0).with_scale(Vec3::splat(1.5)),
+                    texture: texture.clone(),
                     ..default()
                 },
-                ..default()
-            },
+                TextureAtlas {
+                    layout: texture_atlas_layout.clone(),
+                    index: 0,
+                },
             Enemy,
             Name::new("Enemy"),
         ));

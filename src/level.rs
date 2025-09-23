@@ -51,7 +51,7 @@ pub fn xp_collection(
         Query<&Transform, With<Player>>,
     )>,
     mut xp_resource: ResMut<PlayerXP>,
-    mut level_up_writer: EventWriter<LevelUpEvent>, // ✅ Don't forget this
+    mut level_up_writer: EventWriter<LevelUpEvent>,
     time: Res<Time>,
 ) {
     let player_query = param.p1();
@@ -75,7 +75,7 @@ pub fn xp_collection(
                     "🎉 Level Up! Level {}, Next: {}",
                     xp_resource.level, xp_resource.required
                 );
-                level_up_writer.send(LevelUpEvent); // ✅ send the event
+                level_up_writer.send(LevelUpEvent);
             }
         } else if dist < 150.0 {
             let direction = (player_pos - xp_pos).normalize_or_zero();
