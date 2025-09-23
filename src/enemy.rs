@@ -51,7 +51,6 @@ pub fn enemy_spawner(
 
         let texture = asset_server.load("Skeleton.png");
 
-    // the sprite sheet has 7 sprites arranged in a row, and they are all 24px x 24px
         let layout = TextureAtlasLayout::from_grid(UVec2::splat(100), 8, 7, None, None);
         let texture_atlas_layout = texture_atlas_layouts.add(layout);
 
