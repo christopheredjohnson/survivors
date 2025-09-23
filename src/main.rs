@@ -1,10 +1,7 @@
 use bevy::prelude::*;
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 
-use crate::{
-    level::XPPlugin,
-    player::PlayerPlugin,
-};
+use crate::{level::XPPlugin, player::PlayerPlugin};
 
 mod enemy;
 mod level;
@@ -17,15 +14,19 @@ mod weapon;
 
 fn main() {
     App::new()
-        .add_plugins(DefaultPlugins.set(WindowPlugin {
-            primary_window: Some(Window {
-                title: "Vampire Survivors Clone".to_string(),
-                resolution: (800., 600.).into(),
-                ..default()
-            }),
-            ..default()
-        }))
-        .add_plugins((PlayerPlugin, XPPlugin, WorldInspectorPlugin::default()))
+        .add_plugins(
+            DefaultPlugins
+                .set(ImagePlugin::default_nearest())
+                .set(WindowPlugin {
+                    primary_window: Some(Window {
+                        title: "Vampire Survivors Clone".to_string(),
+                        resolution: (800., 600.).into(),
+                        ..default()
+                    }),
+                    ..default()
+                }),
+        )
+        .add_plugins((PlayerPlugin, XPPlugin))
         .insert_resource(weapon::WeaponTimer::default())
         .insert_resource(weapon::WeaponStats::default())
         .insert_resource(enemy::EnemySpawnTimer::default())

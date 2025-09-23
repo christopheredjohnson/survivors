@@ -2,8 +2,61 @@ use crate::player::Player;
 use bevy::prelude::*;
 use rand::Rng;
 
+pub enum EnemyType {
+    Skeleton,
+    Orc,
+    Werewolf
+}
+#[derive(Clone)]
+pub struct EnemyDefinition {
+    pub name: &'static str,
+    pub texture_path: &'static str,
+    pub frame_size: UVec2,
+    pub columns: u32,
+    pub rows: u32,
+    pub scale: f32,
+    pub speed: f32,
+}
+
+impl EnemyType {
+    pub fn definition(&self) -> EnemyDefinition {
+        match self {
+            EnemyType::Skeleton => EnemyDefinition {
+                name: "Skeleton",
+                texture_path: "Skeleton.png",
+                frame_size: UVec2::splat(100),
+                columns: 8,
+                rows: 7,
+                scale: 1.5,
+                speed: 100.0,
+            },
+            EnemyType::Orc => EnemyDefinition {
+                name: "Orc",
+                texture_path: "Orc.png",
+                frame_size: UVec2::splat(100),
+                columns: 8,
+                rows: 7,
+                scale: 1.5,
+                speed: 100.0,
+            },
+            EnemyType::Werewolf => EnemyDefinition {
+                name: "Werewolf",
+                texture_path: "Werewolf.png",
+                frame_size: UVec2::splat(100),
+                columns: 8,
+                rows: 7,
+                scale: 1.5,
+                speed: 100.0,
+            },
+        }
+    }
+}
+
 #[derive(Component)]
-pub struct Enemy;
+pub struct Enemy {
+    pub speed: f32,
+    pub enemy_type: EnemyType,
+}
 
 #[derive(Resource)]
 pub struct EnemySpawnTimer(Timer);
@@ -42,30 +95,41 @@ pub fn enemy_spawner(
         let player_t = player_q.single();
         let mut rng = rand::thread_rng();
 
+        // random enemy type
+        let enemy_type = match rng.gen_range(0..3) {
+            0 => EnemyType::Skeleton,
+            1 => EnemyType::Orc,
+            _ => EnemyType::Werewolf,
+        };
+
+        let def = enemy_type.definition();
+
         // Spawn enemies in a ring around the player
         let angle = rng.gen_range(0.0..std::f32::consts::TAU);
         let radius = rng.gen_range(300.0..400.0);
         let spawn_x = player_t.translation.x + radius * angle.cos();
         let spawn_y = player_t.translation.y + radius * angle.sin();
 
+        let texture = asset_server.load(def.texture_path);
 
-        let texture = asset_server.load("Skeleton.png");
-
-        let layout = TextureAtlasLayout::from_grid(UVec2::splat(100), 8, 7, None, None);
+        let layout = TextureAtlasLayout::from_grid(def.frame_size, def.columns, def.rows, None, None);
         let texture_atlas_layout = texture_atlas_layouts.add(layout);
 
         commands.spawn((
             SpriteBundle {
-                    transform: Transform::from_xyz(spawn_x, spawn_y, 0.0).with_scale(Vec3::splat(1.5)),
-                    texture: texture.clone(),
-                    ..default()
-                },
-                TextureAtlas {
-                    layout: texture_atlas_layout.clone(),
-                    index: 0,
-                },
-            Enemy,
-            Name::new("Enemy"),
+                transform: Transform::from_xyz(spawn_x, spawn_y, 0.0).with_scale(Vec3::splat(def.scale)),
+                texture: texture.clone(),
+                ..default()
+            },
+            TextureAtlas {
+                layout: texture_atlas_layout,
+                index: 0,
+            },
+            Enemy {
+                speed: def.speed,
+                enemy_type,
+            },
+            Name::new(def.name),
         ));
     }
 }

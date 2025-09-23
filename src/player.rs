@@ -31,16 +31,25 @@ impl Plugin for PlayerPlugin {
 
 
 fn spawn_player(
-    mut commands: Commands
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+    mut texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
 ) {
+
+    let texture = asset_server.load("Wizard.png");
+
+    let layout = TextureAtlasLayout::from_grid(UVec2::splat(100), 8, 7, None, None);
+    let texture_atlas_layout = texture_atlas_layouts.add(layout);
+
     commands.spawn((
         SpriteBundle {
-            transform: Transform::from_xyz(0., 0., 0.).with_scale(Vec3::splat(32.)),
-            sprite: Sprite {
-                color: Color::srgb(0.2, 0.8, 0.2),
-                ..default()
-            },
+            transform: Transform::from_xyz(0., 0., 0.).with_scale(Vec3::splat(1.5)),
+            texture: texture.clone(),
             ..default()
+        },
+        TextureAtlas {
+            layout: texture_atlas_layout.clone(),
+            index: 0,
         },
         Player,
         Name::new("Player"),
