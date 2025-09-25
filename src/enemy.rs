@@ -1,3 +1,5 @@
+use std::time::Duration;
+
 use crate::player::Player;
 use bevy::prelude::*;
 use rand::Rng;
@@ -28,7 +30,7 @@ impl EnemyType {
                 columns: 8,
                 rows: 7,
                 scale: 1.5,
-                speed: 100.0,
+                speed: 50.0,
             },
             EnemyType::Orc => EnemyDefinition {
                 name: "Orc",
@@ -46,7 +48,7 @@ impl EnemyType {
                 columns: 8,
                 rows: 7,
                 scale: 1.5,
-                speed: 100.0,
+                speed: 150.0,
             },
         }
     }
@@ -68,17 +70,24 @@ impl Default for EnemySpawnTimer {
 }
 
 pub fn enemy_movement(
-    mut enemies: Query<&mut Transform, With<Enemy>>,
+    mut enemies: Query<(&mut Transform, &Enemy),  Without<Player>>,
     player: Query<&Transform, (With<Player>, Without<Enemy>)>,
     time: Res<Time>,
 ) {
     let player_transform = player.single();
-    for mut transform in enemies.iter_mut() {
+    for (mut transform, enemy) in enemies.iter_mut() {
         let dir = (player_transform.translation - transform.translation)
             .truncate()
             .normalize_or_zero();
-        transform.translation += (dir * 100.0 * time.delta_seconds()).extend(0.0);
+        transform.translation += (dir * enemy.speed * time.delta_seconds()).extend(0.0);
     }
+}
+
+pub fn difficulty_scaling(mut timer: ResMut<EnemySpawnTimer>, time: Res<Time>) {
+    // Example: decrease interval over time
+    let elapsed = time.elapsed_seconds();
+    let new_interval = (0.25 + (100.0 / (elapsed + 100.0))).max(0.1);
+    timer.0.set_duration(Duration::from_secs_f32(new_interval));
 }
 
 pub fn enemy_spawner(

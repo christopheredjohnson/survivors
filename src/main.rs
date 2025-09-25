@@ -37,6 +37,7 @@ fn main() {
                 weapon::weapon_system,
                 projectile::projectile_movement,
                 enemy::enemy_movement,
+                enemy::difficulty_scaling,
                 enemy::enemy_spawner,
                 projectile::projectile_enemy_collision,
                 upgrade_menu::show_upgrade_menu,
