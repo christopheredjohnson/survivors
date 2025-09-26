@@ -60,7 +60,7 @@ pub struct Enemy {
     pub enemy_type: EnemyType,
 }
 
-#[derive(Resource)]
+#[derive(Resource, Reflect)]
 pub struct EnemySpawnTimer(Timer);
 
 impl Default for EnemySpawnTimer {
@@ -84,7 +84,6 @@ pub fn enemy_movement(
 }
 
 pub fn difficulty_scaling(mut timer: ResMut<EnemySpawnTimer>, time: Res<Time>) {
-    // Example: decrease interval over time
     let elapsed = time.elapsed_seconds();
     let new_interval = (0.25 + (100.0 / (elapsed + 100.0))).max(0.1);
     timer.0.set_duration(Duration::from_secs_f32(new_interval));

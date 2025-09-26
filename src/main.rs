@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 
-use crate::{level::XPPlugin, player::PlayerPlugin};
+use crate::{enemy::EnemySpawnTimer, level::XPPlugin, player::PlayerPlugin};
 
 mod enemy;
 mod level;
@@ -26,11 +26,16 @@ fn main() {
                     ..default()
                 }),
         )
-        .add_plugins((PlayerPlugin, XPPlugin))
+        .add_plugins((PlayerPlugin, XPPlugin, WorldInspectorPlugin::default()))
         .insert_resource(weapon::WeaponTimer::default())
         .insert_resource(weapon::WeaponStats::default())
+
+        .register_type::<EnemySpawnTimer>()
         .insert_resource(enemy::EnemySpawnTimer::default())
-        .add_systems(Startup, (setup, ui::setup_xp_bar))
+        .add_systems(Startup, (
+            setup, 
+            ui::setup_xp_bar
+        ))
         .add_systems(
             Update,
             (
