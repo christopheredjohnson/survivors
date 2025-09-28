@@ -1,12 +1,14 @@
 use crate::enemy::Enemy;
+use crate::health::{DamageEvent, Health};
 use crate::weapon::WeaponStats;
 use crate::level;
 use bevy::prelude::*;
 
-#[derive(Component)]
+#[derive(Component, Reflect)]
 pub struct Projectile {
     pub direction: Vec2,
     pub kind: ProjectileKind,
+    pub damage: f32,
 }
 
 #[derive(Clone, Copy, PartialEq, Eq, Reflect)]
@@ -30,6 +32,7 @@ pub fn projectile_movement(
 
 pub fn projectile_enemy_collision(
     mut commands: Commands,
+    mut damage_writer: EventWriter<DamageEvent>,
     projectile_q: Query<(Entity, &Transform, &Projectile)>,
     enemy_q: Query<(Entity, &Transform), With<Enemy>>,
 ) {
@@ -38,29 +41,35 @@ pub fn projectile_enemy_collision(
             if proj_t.translation.distance(enemy_t.translation) < 20.0 {
                 match proj.kind {
                     ProjectileKind::Normal => {
-                        level::spawn_xp(&mut commands, enemy_t.translation);
-                        commands.entity(enemy_e).despawn();
+                        damage_writer.send(DamageEvent {
+                            entity: enemy_e,
+                            amount: proj.damage,
+                        });
                         commands.entity(proj_e).despawn();
                     }
                     ProjectileKind::Fireball => {
-                        // AoE effect: despawn all nearby enemies
                         for (e, t) in enemy_q.iter() {
                             if t.translation.distance(proj_t.translation) < 50.0 {
-                                level::spawn_xp(&mut commands, t.translation);
-                                commands.entity(e).despawn();
+                                damage_writer.send(DamageEvent {
+                                    entity: e,
+                                    amount: proj.damage,
+                                });
                             }
                         }
                         commands.entity(proj_e).despawn();
                     }
                     ProjectileKind::Piercing => {
-                        level::spawn_xp(&mut commands, enemy_t.translation);
-                        // Damage multiple enemies; don't despawn projectile
-                        commands.entity(enemy_e).despawn();
+                        damage_writer.send(DamageEvent {
+                            entity: enemy_e,
+                            amount: proj.damage,
+                        });
+                        // projectile stays alive
                     }
                     ProjectileKind::Ice => {
-                        level::spawn_xp(&mut commands, enemy_t.translation);
-                        // TODO: Slow effect (can be added with a Slowed component + timer)
-                        commands.entity(enemy_e).despawn();
+                        damage_writer.send(DamageEvent {
+                            entity: enemy_e,
+                            amount: proj.damage,
+                        });
                         commands.entity(proj_e).despawn();
                     }
                 }
@@ -69,3 +78,4 @@ pub fn projectile_enemy_collision(
         }
     }
 }
+

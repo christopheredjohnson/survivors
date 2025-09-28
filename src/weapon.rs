@@ -87,6 +87,12 @@ pub fn weapon_system(
                 Projectile {
                     direction: rotated.normalize_or_zero(),
                     kind: stats.current_shot_type,
+                    damage: match stats.current_shot_type {
+                        ProjectileKind::Normal => 25.0,
+                        ProjectileKind::Fireball => 40.0,
+                        ProjectileKind::Piercing => 20.0,
+                        ProjectileKind::Ice => 15.0,
+                    },
                 },
             ));
         }

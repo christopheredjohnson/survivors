@@ -1,9 +1,11 @@
 use std::time::Duration;
 
-use crate::player::Player;
+use crate::{health::{DamageEvent, Health}, player::Player};
 use bevy::prelude::*;
 use rand::Rng;
 
+
+#[derive(Reflect)]
 pub enum EnemyType {
     Skeleton,
     Orc,
@@ -54,7 +56,7 @@ impl EnemyType {
     }
 }
 
-#[derive(Component)]
+#[derive(Component, Reflect)]
 pub struct Enemy {
     pub speed: f32,
     pub enemy_type: EnemyType,
@@ -137,7 +139,25 @@ pub fn enemy_spawner(
                 speed: def.speed,
                 enemy_type,
             },
+            Health::new(100.0),
             Name::new(def.name),
         ));
+    }
+}
+
+pub fn enemy_player_collision(
+    mut damage_writer: EventWriter<DamageEvent>,
+    player_q: Query<(Entity, &Transform), With<Player>>,
+    enemy_q: Query<&Transform, With<Enemy>>,
+) {
+    let (player_e, player_transform) = player_q.single();
+
+    for enemy_t in enemy_q.iter() {
+        if player_transform.translation.distance(enemy_t.translation) < 20.0 {
+            damage_writer.send(DamageEvent {
+                entity: player_e,
+                amount: 10.0,
+            });
+        }
     }
 }

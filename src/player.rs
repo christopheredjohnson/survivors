@@ -1,5 +1,7 @@
 use bevy::prelude::*;
 
+use crate::health::Health;
+
 #[derive(Component)]
 pub struct Player;
 
@@ -52,6 +54,7 @@ fn spawn_player(
             index: 0,
         },
         Player,
+        Health::new(100.0),
         Name::new("Player"),
     ));
 }

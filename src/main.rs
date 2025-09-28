@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 
-use crate::{enemy::EnemySpawnTimer, level::XPPlugin, player::PlayerPlugin};
+use crate::{enemy::{Enemy, EnemySpawnTimer}, health::{DamageEvent, DeathEvent, Health}, level::XPPlugin, player::PlayerPlugin, projectile::Projectile};
 
 mod enemy;
 mod level;
@@ -11,6 +11,7 @@ mod ui;
 mod upgrade;
 mod upgrade_menu;
 mod weapon;
+mod health;
 
 fn main() {
     App::new()
@@ -26,10 +27,13 @@ fn main() {
                     ..default()
                 }),
         )
+        .add_event::<DamageEvent>()
+        .add_event::<DeathEvent>()
         .add_plugins((PlayerPlugin, XPPlugin, WorldInspectorPlugin::default()))
         .insert_resource(weapon::WeaponTimer::default())
         .insert_resource(weapon::WeaponStats::default())
-
+        .register_type::<Health>()
+        .register_type::<Projectile>()
         .register_type::<EnemySpawnTimer>()
         .insert_resource(enemy::EnemySpawnTimer::default())
         .add_systems(Startup, (
@@ -48,6 +52,10 @@ fn main() {
                 upgrade_menu::show_upgrade_menu,
                 upgrade_menu::handle_upgrade_selection,
                 ui::update_xp_bar,
+                enemy::enemy_player_collision,
+                health::apply_damage_system,
+                health::enemy_death_system,
+                health::player_death_system,
             ),
         )
         .run();
