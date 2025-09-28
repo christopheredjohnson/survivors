@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 
-use crate::{enemy::{Enemy, EnemySpawnTimer}, health::{DamageEvent, DeathEvent, Health}, level::XPPlugin, player::PlayerPlugin, projectile::Projectile};
+use crate::{enemy::{EnemySpawnTimer}, health::{DamageEvent, DeathEvent, Health}, level::XPPlugin, player::PlayerPlugin, projectile::Projectile};
 
 mod enemy;
 mod level;

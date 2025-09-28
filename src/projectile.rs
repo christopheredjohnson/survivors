@@ -1,7 +1,6 @@
 use crate::enemy::Enemy;
-use crate::health::{DamageEvent, Health};
+use crate::health::{DamageEvent};
 use crate::weapon::WeaponStats;
-use crate::level;
 use bevy::prelude::*;
 
 #[derive(Component, Reflect)]

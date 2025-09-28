@@ -24,15 +24,9 @@ impl Health {
     pub fn new(max: f32) -> Self {
         Self { current: max, max }
     }
-
-    pub fn apply_damage(&mut self, amount: f32) -> bool {
-        self.current -= amount;
-        self.current <= 0.0
-    }
 }
 
 pub fn apply_damage_system(
-    mut commands: Commands,
     mut damage_events: EventReader<DamageEvent>,
     mut death_writer: EventWriter<DeathEvent>,
     mut health_q: Query<&mut Health>,
