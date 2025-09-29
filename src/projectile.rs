@@ -78,3 +78,14 @@ pub fn projectile_enemy_collision(
     }
 }
 
+pub fn projectile_bounds_cleanup(
+    mut commands: Commands,
+    q: Query<(Entity, &Transform), With<Projectile>>,
+) {
+    for (entity, transform) in q.iter() {
+        let pos = transform.translation;
+        if pos.x.abs() > 1000.0 || pos.y.abs() > 1000.0 {
+            commands.entity(entity).despawn();
+        }
+    }
+}

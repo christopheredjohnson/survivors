@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use crate::health::Health;
+use crate::health::{DamageCooldown, Health};
 
 #[derive(Component)]
 pub struct Player;
@@ -56,6 +56,7 @@ fn spawn_player(
         Player,
         Health::new(100.0),
         Name::new("Player"),
+        DamageCooldown::new(0.0),
     ));
 }
 

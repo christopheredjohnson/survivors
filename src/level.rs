@@ -41,6 +41,7 @@ pub fn spawn_xp(commands: &mut Commands, pos: Vec3) {
             ..default()
         },
         XP,
+        Name::new("XP Orb")
     ));
 }
 

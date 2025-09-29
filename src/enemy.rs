@@ -1,6 +1,6 @@
 use std::time::Duration;
 
-use crate::{health::{DamageEvent, Health}, player::Player};
+use crate::{health::{DamageCooldown, DamageEvent, Health}, player::Player};
 use bevy::prelude::*;
 use rand::Rng;
 
@@ -147,17 +147,26 @@ pub fn enemy_spawner(
 
 pub fn enemy_player_collision(
     mut damage_writer: EventWriter<DamageEvent>,
-    player_q: Query<(Entity, &Transform), With<Player>>,
+    mut player_q: Query<(Entity, &Transform, &mut DamageCooldown), With<Player>>,
     enemy_q: Query<&Transform, With<Enemy>>,
 ) {
-    let (player_e, player_transform) = player_q.single();
+    let (player_e, player_transform, mut cooldown) = player_q.single_mut();
+
+    if !cooldown.is_ready() {
+        return;
+    }
 
     for enemy_t in enemy_q.iter() {
         if player_transform.translation.distance(enemy_t.translation) < 20.0 {
+    
             damage_writer.send(DamageEvent {
                 entity: player_e,
                 amount: 10.0,
             });
+
+            cooldown.timer = Timer::from_seconds(1.0, TimerMode::Once);
+            break;
         }
     }
 }
+

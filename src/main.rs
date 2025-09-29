@@ -37,8 +37,10 @@ fn main() {
         .register_type::<EnemySpawnTimer>()
         .insert_resource(enemy::EnemySpawnTimer::default())
         .add_systems(Startup, (
+            
             setup, 
-            ui::setup_xp_bar
+            ui::setup_xp_bar,
+          
         ))
         .add_systems(
             Update,
@@ -56,6 +58,10 @@ fn main() {
                 health::apply_damage_system,
                 health::enemy_death_system,
                 health::player_death_system,
+                health::tick_damage_cooldown,
+                health::spawn_health_bar,
+                health::update_health_bars,
+                projectile::projectile_bounds_cleanup,
             ),
         )
         .run();
